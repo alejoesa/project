@@ -20,6 +20,8 @@ const s3Client = new S3Client({
     accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
     secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
   },
+  endpoint: `https://s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com`,
+  forcePathStyle: true,
 });
 
 interface FileMetadata {
@@ -94,6 +96,9 @@ export const FileUploader: React.FC = () => {
             tags: metadata.tags.join(','),
           },
         },
+        queueSize: 4, // Número de partes para subir en paralelo
+        partSize: 5 * 1024 * 1024, // 5MB por parte
+        leavePartsOnError: false, // Limpiar partes fallidas
       });
 
       upload.on('httpUploadProgress', (progress) => {
